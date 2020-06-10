@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">HoneyImHome</string>
+    <string name="app_name">Honey I\'m Home</string>
+    <string name="locationLatitudeTitle">Location\'s Latitude: </string>
+    <string name="defaultInfo">""</string>
+    <string name="locationLongitudeTitle">Location\'s Longitude: </string>
+    <string name="accuracyTitle">Accuracy: </string>
+    <string name="trackingButtonStart">Start Tracking Location</string>
+    <string name="trackingButtonStop">Stop Tracking Location</string>
+    <string name="clearHomeButton">Clear Home Location</string>
+    <string name="setHomeButton">Set Location As Home</string>
+    <string name="yourLocation"> YOUR LOCATION:</string>
+    <string name="homeLocationTitle"> YOUR HOME LOCATION IS DEFINED AS:</string>
 </resources>
