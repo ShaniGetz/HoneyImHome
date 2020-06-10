@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private class locationBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            LocationInfo homeLocation = locationTracker.updateData();
             String action = intent.getAction();
             if (action == null) {
                 return;
@@ -79,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
                 case LocationTracker.LOCATION_CHANGED:
                     trackingButton(true);
                     updateLocationInfo();
+                    if(homeLocation!=null){
+                        showHomeLocationInfoView(true);
+                    }else {
+                        showHomeLocationInfoView(false);
+                    }
                     if (locationTracker.getLocationInfo().getAccuracy() < 50) {
                         setHomeButton(true);
                     }
@@ -88,14 +94,21 @@ public class MainActivity extends AppCompatActivity {
                     trackingButton(false);
                     setHomeButton(false);
                     showLocationInfoView(false);
+                    if(homeLocation!=null){
+                        showHomeLocationInfoView(true);
+                    }else {
+                        showHomeLocationInfoView(false);
+                    }
                     break;
                 case LocationTracker.SET_HOME:
                     clearHomeButton(true);
                     updateHomeLocation(false);
+                    showHomeLocationInfoView(true);
                     break;
                 case LocationTracker.CLEAR_HOME:
                     clearHomeButton(false);
                     updateHomeLocation(true);
+                    showHomeLocationInfoView(false);
                     break;
             }
         }
@@ -137,16 +150,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
     private void updateHomeLocation(boolean clean) {
-        TextView homeLocationTitle = findViewById(R.id.homeLocationTitle);
         if (clean) {
             homeLocationLatitude.setText(getResources().getString(R.string.defaultInfo));
             homeLocationLongitude.setText(getResources().getString(R.string.defaultInfo));
-            homeLocationTitle.setVisibility(View.INVISIBLE);
+            showHomeLocationInfoView(false);
         } else {
             LocationInfo homeLocation = locationTracker.getHomeLocation();
             homeLocationLatitude.setText(String.valueOf(homeLocation.getLatitude()));
             homeLocationLongitude.setText(String.valueOf(homeLocation.getLangitude()));
-            homeLocationTitle.setVisibility(View.VISIBLE);
+            showHomeLocationInfoView(true);
         }
     }
 
@@ -155,7 +167,6 @@ public class MainActivity extends AppCompatActivity {
             TextView latitudeTitle = findViewById(R.id.latitudeTitle);
             TextView longitudeTitle = findViewById(R.id.longitudeTitle);
             TextView accuracyTitle = findViewById(R.id.accuracyTitle);
-            TextView homeLocationTitle = findViewById(R.id.homeLocationTitle);
             if (ifShow) {
                 setHomeButton.setVisibility(View.VISIBLE);
                 clearHomeButton.setVisibility(View.VISIBLE);
@@ -167,10 +178,6 @@ public class MainActivity extends AppCompatActivity {
                 latitude.setVisibility(View.VISIBLE);
                 longitude.setVisibility(View.VISIBLE);
                 accuracy.setVisibility(View.VISIBLE);
-                homeLocationTitle.setVisibility(View.VISIBLE);
-                homeLocationLatitude.setVisibility(View.VISIBLE);
-                homeLocationLongitude.setVisibility(View.VISIBLE);
-
             } else {
                 setHomeButton.setVisibility(View.INVISIBLE);
                 clearHomeButton.setVisibility(View.INVISIBLE);
@@ -182,11 +189,21 @@ public class MainActivity extends AppCompatActivity {
                 latitude.setVisibility(View.INVISIBLE);
                 longitude.setVisibility(View.INVISIBLE);
                 accuracy.setVisibility(View.INVISIBLE);
-                homeLocationTitle.setVisibility(View.INVISIBLE);
-                homeLocationLongitude.setVisibility(View.INVISIBLE);
-                homeLocationLatitude.setVisibility(View.INVISIBLE);
             }
         }
+
+    private void showHomeLocationInfoView(boolean ifShow) {
+        TextView homeLocationTitle = findViewById(R.id.homeLocationTitle);
+        if (ifShow) {
+            homeLocationTitle.setVisibility(View.VISIBLE);
+            homeLocationLatitude.setVisibility(View.VISIBLE);
+            homeLocationLongitude.setVisibility(View.VISIBLE);
+        }else{
+            homeLocationTitle.setVisibility(View.INVISIBLE);
+            homeLocationLongitude.setVisibility(View.INVISIBLE);
+            homeLocationLatitude.setVisibility(View.INVISIBLE);
+        }
+    }
 
         public void toastMessage(String message) {
             Toast newToast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
@@ -242,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
         if (locationTracker.isOnTracking()) {
             locationTracker.stopTracking();
         }
-        unregisterReceiver(broadcastReceiver);//remove the registration in onDestroy()
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -252,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
             locationTracker.startTracking();
         } else {
             showLocationInfoView(false);
+            showHomeLocationInfoView(false);
         }
         updateLocationInfo();
         LocationInfo homeLocation = locationTracker.updateData();

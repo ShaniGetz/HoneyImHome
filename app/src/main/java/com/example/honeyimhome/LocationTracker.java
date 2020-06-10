@@ -10,11 +10,11 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import com.google.gson.Gson;
-import com.google.android.gms.location.FusedLocationProviderClient;
 
 
 public class LocationTracker implements LocationListener{
@@ -26,8 +26,9 @@ public class LocationTracker implements LocationListener{
     private static final String SP_HOME_LOCATION = "homeLocation";
     private static final String SP_LOCATION_INFO = "locationInfo";
     private static final String SP_IS_TRACKING = "isOnTracking";
+    private static final String PERMISSION = "permission_err";
+    private static final String PERMISSION_MSG = "No location permission";
 
-    private FusedLocationProviderClient fusedLocationClient;
     private Context appContext;
     private boolean isOnTracking;
     private LocationInfo locationInfo;
@@ -52,7 +53,6 @@ public class LocationTracker implements LocationListener{
     }
 
     public void startTracking() {
-        //add a basic check that assert you have the runtime location permission
         this.isOnTracking = true;
         sp.edit().putBoolean(SP_IS_TRACKING, isOnTracking).apply();
         boolean hasLocationPermissions = ActivityCompat.checkSelfPermission(appContext,
@@ -63,36 +63,13 @@ public class LocationTracker implements LocationListener{
                         5000, 5, this);
                 Gson gson = new Gson();
                 sp.edit().putString(SP_LOCATION_INFO, gson.toJson(locationInfo)).apply();
+        }else {
+                Log.e(PERMISSION, PERMISSION_MSG);
             }
         }
+    }
 
-//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
-//        if (ActivityCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
-//            Log.e("Permission:", "Enable GPS amd Internet");
-//            return;
-//        }
-//        fusedLocationClient.getLastLocation()
-//                .addOnSuccessListener(activity, new OnSuccessListener<Location>() {
-//                    @Override
-//                    public void onSuccess(Location location) {
-//                        // Got last known location. In some rare situations this can be null.
-//                        if (location != null) {
-//                            // Logic to handle location object
-//                            locationInfo.setLangitude(location.getLongitude());
-//                            locationInfo.setLatitude(location.getLatitude());
-//                            locationInfo.setAccuracy(location.getAccuracy());
-//                        }
-//                    }
-//                });
-////        getLocation();
-//        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, LOCATION_RE);
-//        broadcastStopTracking(appContext);
-        }
-
-        //which will start tracking the location and send a "started" boradcast intent
-    //if yes continue to track location, if not just log some error to logcat and don't do anything
-
-    public void stopTracking(){//which will stop tracking
+    public void stopTracking(){
         this.isOnTracking = false;
         sp.edit().putBoolean(SP_IS_TRACKING, isOnTracking).apply();
         locationManager.removeUpdates(this);
@@ -163,32 +140,4 @@ public class LocationTracker implements LocationListener{
         return homeLocation;
 
     }
-
-//    private void startLocationUpdates() {
-//        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-//    }
-
-
-    // Listen to Android system event - permission change- while tracking, whenever a new
-    // location has been received, send a "new_location" broadcast Intent
-    // Broadcast the event to all the activities
-
-//    private void broadcastTracking(Context context) {
-//        Intent intent = new Intent();
-//        intent.putExtra("locationInfoLatitude", locationInfo.getLatitude());
-//        intent.putExtra("locationInfoLangitude", locationInfo.getLangitude());
-//        intent.putExtra("locationInfoAccuracy()", locationInfo.getAccuracy());
-//        intent.setAction(NEW_LOCATION);
-//        context.sendBroadcast(intent);
-//    }
-
-//    void getLocation(){
-//        try{
-//            locationManager = (LocationManager) appContext.getSystemService(appContext.LOCATION_SERVICE);
-//            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, this);
-//        }catch(SecurityException e){
-//            e.printStackTrace();
-//        }
-//    }
-
 }
