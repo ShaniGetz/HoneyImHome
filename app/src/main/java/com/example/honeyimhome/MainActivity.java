@@ -162,35 +162,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-        private void showLocationInfoView(boolean ifShow) {
-            TextView yourLocation = findViewById(R.id.yourLocation);
-            TextView latitudeTitle = findViewById(R.id.latitudeTitle);
-            TextView longitudeTitle = findViewById(R.id.longitudeTitle);
-            TextView accuracyTitle = findViewById(R.id.accuracyTitle);
-            if (ifShow) {
-                setHomeButton.setVisibility(View.VISIBLE);
-                clearHomeButton.setVisibility(View.VISIBLE);
-                yourLocation.setVisibility(View.VISIBLE);
-                latitudeTitle.setVisibility(View.VISIBLE);
-                accuracyTitle.setVisibility(View.VISIBLE);
-                longitudeTitle.setVisibility(View.VISIBLE);
-                accuracyTitle.setVisibility(View.VISIBLE);
-                latitude.setVisibility(View.VISIBLE);
-                longitude.setVisibility(View.VISIBLE);
-                accuracy.setVisibility(View.VISIBLE);
-            } else {
-                setHomeButton.setVisibility(View.INVISIBLE);
-                clearHomeButton.setVisibility(View.INVISIBLE);
-                yourLocation.setVisibility(View.INVISIBLE);
-                latitudeTitle.setVisibility(View.INVISIBLE);
-                accuracyTitle.setVisibility(View.INVISIBLE);
-                longitudeTitle.setVisibility(View.INVISIBLE);
-                accuracyTitle.setVisibility(View.INVISIBLE);
-                latitude.setVisibility(View.INVISIBLE);
-                longitude.setVisibility(View.INVISIBLE);
-                accuracy.setVisibility(View.INVISIBLE);
-            }
+    private void showLocationInfoView(boolean ifShow) {
+        TextView yourLocation = findViewById(R.id.yourLocation);
+        TextView latitudeTitle = findViewById(R.id.latitudeTitle);
+        TextView longitudeTitle = findViewById(R.id.longitudeTitle);
+        TextView accuracyTitle = findViewById(R.id.accuracyTitle);
+        if (ifShow) {
+            setHomeButton.setVisibility(View.VISIBLE);
+            clearHomeButton.setVisibility(View.VISIBLE);
+            yourLocation.setVisibility(View.VISIBLE);
+            latitudeTitle.setVisibility(View.VISIBLE);
+            accuracyTitle.setVisibility(View.VISIBLE);
+            longitudeTitle.setVisibility(View.VISIBLE);
+            accuracyTitle.setVisibility(View.VISIBLE);
+            latitude.setVisibility(View.VISIBLE);
+            longitude.setVisibility(View.VISIBLE);
+            accuracy.setVisibility(View.VISIBLE);
+        } else {
+            setHomeButton.setVisibility(View.INVISIBLE);
+            clearHomeButton.setVisibility(View.INVISIBLE);
+            yourLocation.setVisibility(View.INVISIBLE);
+            latitudeTitle.setVisibility(View.INVISIBLE);
+            accuracyTitle.setVisibility(View.INVISIBLE);
+            longitudeTitle.setVisibility(View.INVISIBLE);
+            accuracyTitle.setVisibility(View.INVISIBLE);
+            latitude.setVisibility(View.INVISIBLE);
+            longitude.setVisibility(View.INVISIBLE);
+            accuracy.setVisibility(View.INVISIBLE);
         }
+    }
 
     private void showHomeLocationInfoView(boolean ifShow) {
         TextView homeLocationTitle = findViewById(R.id.homeLocationTitle);
@@ -205,39 +205,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-        public void toastMessage(String message) {
-            Toast newToast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
-            newToast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
-            ViewGroup group = (ViewGroup) newToast.getView();
-            TextView messageTextView = (TextView) group.getChildAt(0);
-            messageTextView.setTextSize(16);
-            newToast.show();
+    public void toastMessage(String message) {
+        Toast newToast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        newToast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+        ViewGroup group = (ViewGroup) newToast.getView();
+        TextView messageTextView = (TextView) group.getChildAt(0);
+        messageTextView.setTextSize(16);
+        newToast.show();
         }
 
-        public void OnTrackLocationButtonClick(View view) {
-            if (locationTracker.isOnTracking()) {
-                locationTracker.stopTracking();
+    public void OnTrackLocationButtonClick(View view) {
+        if (locationTracker.isOnTracking()) {
+            locationTracker.stopTracking();
+        } else {
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                locationTracker.startTracking();
             } else {
-                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED) {
-                    locationTracker.startTracking();
-                } else {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        toastMessage(REQUIRED_MSG);
-                    }
-                    ActivityCompat.requestPermissions(activity,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_PERMISSION_FINE_LOCATION);
+                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    toastMessage(REQUIRED_MSG);
                 }
+                ActivityCompat.requestPermissions(activity,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_PERMISSION_FINE_LOCATION);
             }
         }
+    }
 
-        public void OnSetHomeButtonClick(View view) {
-            locationTracker.setHomeLocation();
-        }
+    public void OnSetHomeButtonClick(View view) {
+        locationTracker.setHomeLocation();
+    }
 
-        public void OnClearHomeButtonClick(View view){
-            locationTracker.clearHome();
-        }
+    public void OnClearHomeButtonClick(View view){
+        locationTracker.clearHome();
+    }
 
 
     @Override
@@ -269,20 +269,14 @@ public class MainActivity extends AppCompatActivity {
             locationTracker.startTracking();
         } else {
             showLocationInfoView(false);
-            showHomeLocationInfoView(false);
         }
-        updateLocationInfo();
         LocationInfo homeLocation = locationTracker.updateData();
         if(homeLocation == null){
             clearHomeButton(false);
+            showHomeLocationInfoView(false);
         }else{
             clearHomeButton(true);
             updateHomeLocation(false);
-        }
-        if(locationTracker.getLocationInfo().getAccuracy()<50){
-            setHomeButton(true);
-        }else{
-            setHomeButton(false);
         }
     }
 }

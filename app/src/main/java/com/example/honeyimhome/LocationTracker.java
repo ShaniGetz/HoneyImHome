@@ -24,10 +24,11 @@ public class LocationTracker implements LocationListener{
     public static final String SET_HOME = "setHome";
     public static final String CLEAR_HOME = "clearHome";
     private static final String SP_HOME_LOCATION = "homeLocation";
-    private static final String SP_LOCATION_INFO = "locationInfo";
     private static final String SP_IS_TRACKING = "isOnTracking";
     private static final String PERMISSION = "permission_err";
     private static final String PERMISSION_MSG = "No location permission";
+    private static final String ENABLE_MSG = "Please Enable GPS and Internet";
+
 
     private Context appContext;
     private boolean isOnTracking;
@@ -45,11 +46,6 @@ public class LocationTracker implements LocationListener{
         String json = sp.getString(SP_HOME_LOCATION, "");
         this.homeLocation = gson.fromJson(json, LocationInfo.class);
         isOnTracking = sp.getBoolean(SP_IS_TRACKING, false);
-        json = sp.getString(SP_LOCATION_INFO, "");
-        this.locationInfo = gson.fromJson(json, LocationInfo.class);
-        if (this.locationInfo == null) {
-            this.locationInfo = new LocationInfo();
-        }
     }
 
     public void startTracking() {
@@ -61,8 +57,6 @@ public class LocationTracker implements LocationListener{
             if(locationManager!=null){
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                         5000, 5, this);
-                Gson gson = new Gson();
-                sp.edit().putString(SP_LOCATION_INFO, gson.toJson(locationInfo)).apply();
         }else {
                 Log.e(PERMISSION, PERMISSION_MSG);
             }
@@ -85,9 +79,6 @@ public class LocationTracker implements LocationListener{
     public LocationInfo getHomeLocation(){return this.homeLocation;}
 
     public void setHomeLocation(){
-//        this.homeLocation.setAccuracy(locationInfo.getAccuracy());
-////        this.homeLocation.setLangitude(locationInfo.getLangitude());
-////        this.homeLocation.setLatitude(locationInfo.getLatitude());
         this.homeLocation = locationInfo;
         Gson gson = new Gson();
         sp.edit().putString(SP_HOME_LOCATION, gson.toJson(homeLocation)).apply();
@@ -124,18 +115,13 @@ public class LocationTracker implements LocationListener{
 
     @Override
     public void onProviderDisabled(String provider) {
-        Toast.makeText(appContext, "Please Enable GPS amd Internet", Toast.LENGTH_SHORT).show();
+        Toast.makeText(appContext, ENABLE_MSG, Toast.LENGTH_SHORT).show();
     }
 
     public LocationInfo updateData(){
         Gson gson = new Gson();
         String json = sp.getString(SP_HOME_LOCATION, "");
         homeLocation = gson.fromJson(json, LocationInfo.class);
-        json = sp.getString(SP_LOCATION_INFO, "");
-        locationInfo = gson.fromJson(json, LocationInfo.class);
-        if (this.locationInfo == null) {
-            this.locationInfo = new LocationInfo();
-        }
         isOnTracking = sp.getBoolean(SP_IS_TRACKING, false);
         return homeLocation;
 

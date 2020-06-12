@@ -14,15 +14,6 @@ public class LocationInfo {
 
     LocationInfo(){}
 
-    public void setLatitude(double latitude){
-        this.latitude = latitude;
-    }
-    public void setLangitude(double langitude){
-        this.langitude = langitude;
-    }
-    public void setAccuracy(float accuracy){
-        this.accuracy = accuracy;
-    }
     public double getLatitude(){
         return latitude;
     }
