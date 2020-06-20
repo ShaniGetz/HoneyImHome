@@ -8,19 +8,19 @@
 
     <TextView
         android:id="@+id/yourLocation"
-        android:textColor="@color/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
         android:fontFamily="sans-serif-smallcaps"
         android:text="@string/yourLocation"
+        android:textColor="@color/colorPrimary"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/latitude"
-        android:layout_marginTop="20dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-         />
+        app:layout_constraintVertical_bias="0.166" />
 
     <TextView
         android:id="@+id/latitudeTitle"
@@ -30,25 +30,26 @@
         android:text="@string/locationLatitudeTitle"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@id/trackingButton"
-        app:layout_constraintHorizontal_bias="0.065"
+        app:layout_constraintHorizontal_bias="0.066"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2" />
+        app:layout_constraintVertical_bias="0.23" />
 
     <TextView
         android:id="@+id/latitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
         android:fontFamily="sans-serif-smallcaps"
         android:text="@string/defaultInfo"
         android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@+id/latitudeTitle"
         app:layout_constraintBottom_toBottomOf="@id/trackingButton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/latitudeTitle"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2" />
+        app:layout_constraintVertical_bias="0.228" />
 
     <TextView
         android:id="@+id/longitudeTitle"
@@ -68,15 +69,16 @@
         android:id="@+id/longitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:fontFamily="sans-serif-smallcaps"
         android:text="@string/defaultInfo"
         android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@+id/longitudeTitle"
         app:layout_constraintBottom_toTopOf="@id/trackingButton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/longitudeTitle"
         app:layout_constraintTop_toBottomOf="@id/latitudeTitle"
-        app:layout_constraintVertical_bias="0.05" />
+        app:layout_constraintVertical_bias="0.047" />
 
     <TextView
         android:id="@+id/accuracyTitle"
@@ -96,31 +98,33 @@
         android:id="@+id/accuracy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:fontFamily="sans-serif-smallcaps"
         android:text="@string/defaultInfo"
         android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@+id/accuracyTitle"
         app:layout_constraintBottom_toTopOf="@id/trackingButton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/accuracyTitle"
         app:layout_constraintTop_toBottomOf="@id/longitudeTitle"
-        app:layout_constraintVertical_bias="0.05" />
+        app:layout_constraintVertical_bias="0.045" />
 
     <TextView
         android:id="@+id/homeLocationTitle"
-        android:textColor="@color/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:fontFamily="sans-serif-smallcaps"
         android:text="@string/homeLocationTitle"
+        android:textColor="@color/colorPrimary"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/trackingButton"
-        android:layout_marginTop="20dp"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.521" />
+        app:layout_constraintVertical_bias="0.632" />
 
     <TextView
         android:id="@+id/homeLocationLatitude"
@@ -158,51 +162,85 @@
         android:layout_width="230sp"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:textColor="#ffff"
         android:fadingEdge="horizontal"
         android:fontFamily="sans-serif"
+        android:onClick="OnTrackLocationButtonClick"
         android:text="@string/trackingButtonStart"
+        android:textColor="#ffff"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.65"
-        android:onClick="OnTrackLocationButtonClick"/>
+        app:layout_constraintVertical_bias="0.499" />
 
     <Button
         android:id="@+id/setHomeButton"
         android:layout_width="230sp"
         android:layout_height="wrap_content"
+        android:background="@color/grey"
         android:clickable="false"
         android:fontFamily="sans-serif"
-        android:background="@color/grey"
-        android:textColor="#ffff"
+        android:onClick="OnSetHomeButtonClick"
         android:text="@string/setHomeButton"
+        android:textColor="#ffff"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/trackingButton"
-        app:layout_constraintVertical_bias="0.1"
-        android:onClick="OnSetHomeButtonClick"/>
+        app:layout_constraintVertical_bias="0.148" />
 
     <Button
         android:id="@+id/clearHomeButton"
         android:layout_width="230sp"
         android:layout_height="wrap_content"
+        android:background="@color/grey"
         android:clickable="false"
         android:fontFamily="sans-serif"
-        android:background="@color/grey"
-        android:textColor="#ffff"
+        android:onClick="OnClearHomeButtonClick"
         android:text="@string/clearHomeButton"
+        android:textColor="#ffff"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/setHomeButton"
-        app:layout_constraintVertical_bias="0.1"
-        android:onClick="OnClearHomeButtonClick"/>
+        app:layout_constraintVertical_bias="0.053" />
+
+    <Button
+        android:id="@+id/deletePhoneButton"
+        android:layout_width="230sp"
+        android:layout_height="wrap_content"
+        android:background="@color/grey"
+        android:clickable="false"
+        android:fontFamily="sans-serif"
+        android:onClick="OnDeletePhoneButtonClick"
+        android:text="@string/delete_phone"
+        android:textColor="#ffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/clearHomeButton"
+        app:layout_constraintVertical_bias="0.069" />
+
+    <Button
+        android:id="@+id/setPhoneButton"
+        android:layout_width="230sp"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:clickable="true"
+        android:fontFamily="sans-serif"
+        android:onClick="OnSmsButtonClick"
+        android:text="@string/set_phone"
+        android:textColor="#ffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/deletePhoneButton"
+        app:layout_constraintVertical_bias="0.116" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

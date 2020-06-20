@@ -3,11 +3,14 @@ package com.example.honeyimhome;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -16,6 +19,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,17 +37,28 @@ public class MainActivity extends AppCompatActivity {
     private TextView homeLocationLatitude;
     private TextView homeLocationLongitude;
 
+    private Button deletePhoneButton;
+    private Button smsButton;
 
-    private static final String PERMISSION_MSG = "Application will not run without location permission";
+    private MyApplication myApp;
+    private MessageManager messageManager;
+
+    BroadcastReceiver smsBroadcastReceiver;
+    LocalBroadcastManager localBroadcastManager;
+
+
+    private static final String LOCATION_PERMISSION_MSG = "Application will not run without location permission";
+    private static final String SMS_PERMISSION_MSG = "No SMS permission granted";
     private static final String REQUIRED_MSG = "Application required to access location";
 
-    public static final int REQUEST_CODE_PERMISSION_FINE_LOCATION = 1234;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        locationTracker = new LocationTracker(getApplicationContext());
+        myApp = (MyApplication) getApplicationContext();
+        locationTracker = myApp.getLocationTracker();
+        messageManager = myApp.getMessageManager();
         setAllViews();
         setBroadcastReceiver();
     }
@@ -57,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
         accuracy = findViewById(R.id.accuracy);
         homeLocationLatitude = findViewById(R.id.homeLocationLatitude);
         homeLocationLongitude = findViewById(R.id.homeLocationLongitude);
+
+        deletePhoneButton = findViewById(R.id.deletePhoneButton);
+        smsButton = findViewById(R.id.setPhoneButton);
     }
 
     private void setBroadcastReceiver() {
@@ -114,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-        private void trackingButton(boolean startTracking) {
+    private void trackingButton(boolean startTracking) {
             if (startTracking) {
                 trackLocationButton.setText(getResources().getString(R.string.trackingButtonStop));
             } else {
@@ -122,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private void setHomeButton(boolean setHome) {
+    private void setHomeButton(boolean setHome) {
             if (setHome) {
                 setHomeButton.setClickable(true);
                 setHomeButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
@@ -142,12 +160,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-        private void updateLocationInfo() {
-            LocationInfo locationInfo = locationTracker.getLocationInfo();
-            latitude.setText(String.valueOf(locationInfo.getLatitude()));
-            longitude.setText(String.valueOf(locationInfo.getLangitude()));
-            accuracy.setText(String.valueOf(locationInfo.getAccuracy()));
-        }
+    private void updateLocationInfo() {
+        LocationInfo locationInfo = locationTracker.getLocationInfo();
+        latitude.setText(String.valueOf(locationInfo.getLatitude()));
+        longitude.setText(String.valueOf(locationInfo.getLangitude()));
+        accuracy.setText(String.valueOf(locationInfo.getAccuracy()));
+    }
 
     private void updateHomeLocation(boolean clean) {
         if (clean) {
@@ -226,10 +244,76 @@ public class MainActivity extends AppCompatActivity {
                     toastMessage(REQUIRED_MSG);
                 }
                 ActivityCompat.requestPermissions(activity,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_PERMISSION_FINE_LOCATION);
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LocationTracker.REQUEST_CODE_PERMISSION_FINE_LOCATION);
             }
         }
     }
+
+    private void setSmsButton(boolean hasPhone) {
+        if (hasPhone) {
+            smsButton.setText(myApp.getResources().getString(R.string.test_sms));
+            deletePhoneButton.setClickable(true);
+            deletePhoneButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+        } else {
+            smsButton.setText(myApp.getResources().getString(R.string.set_phone));
+            deletePhoneButton.setClickable(false);
+            deletePhoneButton.setBackgroundColor(getResources().getColor(R.color.grey));
+        }
+    }
+
+    private void setPhoneNumber() {
+        final EditText input = new EditText(MainActivity.this);
+        input.setPadding(50, 100, 50, 15);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Set a phone number")
+                .setView(input)
+                .setPositiveButton("Confirm",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                messageManager.setPhoneNumber(input.getText().toString());
+                                setSmsButton(true);
+                            }
+                        })
+                .setNegativeButton("Delete",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                                messageManager.setPhoneNumber("");
+                                setSmsButton(false);
+                            }
+                        })
+                .show();
+    }
+
+    public void OnDeletePhoneButtonClick(View view){
+        messageManager.setPhoneNumber("");
+        setSmsButton(false);
+    }
+
+
+    public void OnSmsButtonClick(View view){
+            String phoneNumber = messageManager.getPhoneNumber();
+            if ((phoneNumber != null) && !phoneNumber.isEmpty()) {
+                Intent smsIntent = new Intent();
+                smsIntent.setAction(MessageManager.SEND_SMS);
+                smsIntent.putExtra(MessageManager.PHONE_NUMBER_KEY, phoneNumber);
+                smsIntent.putExtra(MessageManager.SMS_CONTENT_KEY, "Honey I'm Sending a Test Message!");
+                myApp.getLocalBroadcastManager().sendBroadcast(smsIntent);
+            } else {
+                if (messageManager.hasSmsPermission()) {
+                    setPhoneNumber();
+                } else {
+                    ActivityCompat.requestPermissions(
+                            activity,
+                            new String[]{Manifest.permission.SEND_SMS},
+                            MessageManager.REQUEST_CODE_PERMISSION_SEND_TEXT);
+                }
+            }
+        }
 
     public void OnSetHomeButtonClick(View view) {
         locationTracker.setHomeLocation();
@@ -244,11 +328,18 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            locationTracker.startTracking();
+            if (requestCode == LocationTracker.REQUEST_CODE_PERMISSION_FINE_LOCATION) {
+                locationTracker.startTracking();
+            } else if (requestCode == MessageManager.REQUEST_CODE_PERMISSION_SEND_TEXT) {
+                setPhoneNumber();
+            }
         } else {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                toastMessage(PERMISSION_MSG);
+                toastMessage(LOCATION_PERMISSION_MSG);
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.SEND_SMS)) {
+                toastMessage(SMS_PERMISSION_MSG);
             }
         }
     }
@@ -260,11 +351,18 @@ public class MainActivity extends AppCompatActivity {
             locationTracker.stopTracking();
         }
         unregisterReceiver(broadcastReceiver);
+        if (localBroadcastManager != null) {
+            localBroadcastManager.unregisterReceiver(smsBroadcastReceiver);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        messageManager.getPhoneData();
+        if (messageManager.getPhoneNumber() != null && !messageManager.getPhoneNumber().isEmpty()) {
+            setSmsButton(true);
+        }
         if (locationTracker.isOnTracking()) {
             locationTracker.startTracking();
         } else {

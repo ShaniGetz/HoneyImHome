@@ -23,12 +23,14 @@ public class LocationTracker implements LocationListener{
     public static final String STOPPED_TRACKING = "stoppedTracking";
     public static final String SET_HOME = "setHome";
     public static final String CLEAR_HOME = "clearHome";
+    public static final String GOOD_ACCURACY = "goodAccuracy";
     private static final String SP_HOME_LOCATION = "homeLocation";
     private static final String SP_IS_TRACKING = "isOnTracking";
     private static final String PERMISSION = "permission_err";
     private static final String PERMISSION_MSG = "No location permission";
     private static final String ENABLE_MSG = "Please Enable GPS and Internet";
 
+    public static final int REQUEST_CODE_PERMISSION_FINE_LOCATION = 1234;
 
     private Context appContext;
     private boolean isOnTracking;
@@ -36,9 +38,11 @@ public class LocationTracker implements LocationListener{
     private LocationInfo homeLocation;
     private LocationManager locationManager;
     private SharedPreferences sp;
+    private boolean isWorker;
 
-    LocationTracker(Context context) {
+    LocationTracker(Context context, boolean isWorker) {
         this.appContext = context;
+        this.isWorker = isWorker;
         this.isOnTracking = false;
         this.locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         this.sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -67,10 +71,15 @@ public class LocationTracker implements LocationListener{
         this.isOnTracking = false;
         sp.edit().putBoolean(SP_IS_TRACKING, isOnTracking).apply();
         locationManager.removeUpdates(this);
-        Intent locationIntent = new Intent();
-        locationIntent.setAction(STOPPED_TRACKING);
-        appContext.sendBroadcast(locationIntent);
+        if (!this.isWorker) {
+            sp.edit().putBoolean(SP_IS_TRACKING, isOnTracking).apply();
+            Intent locationIntent = new Intent();
+            locationIntent.setAction(STOPPED_TRACKING);
+            appContext.sendBroadcast(locationIntent);
+        }
     }
+
+    public SharedPreferences getSp() { return sp; }
 
     public boolean isOnTracking() {return this.isOnTracking; }
 
@@ -98,9 +107,17 @@ public class LocationTracker implements LocationListener{
     @Override
     public void onLocationChanged(Location location) {
         locationInfo = new LocationInfo(location.getLatitude(), location.getLongitude(), location.getAccuracy());
-        Intent locationIntent = new Intent();
-        locationIntent.setAction(LOCATION_CHANGED);
-        appContext.sendBroadcast(locationIntent);
+        if (isWorker) {
+            if (location.getAccuracy() < 50) {
+                Intent locationIntent = new Intent();
+                locationIntent.setAction(GOOD_ACCURACY);
+                appContext.sendBroadcast(locationIntent);
+            }
+        } else {
+            Intent locationIntent = new Intent();
+            locationIntent.setAction(LOCATION_CHANGED);
+            appContext.sendBroadcast(locationIntent);
+        }
     }
 
     @Override
@@ -125,5 +142,11 @@ public class LocationTracker implements LocationListener{
         isOnTracking = sp.getBoolean(SP_IS_TRACKING, false);
         return homeLocation;
 
+    }
+    public void getData() {
+        Gson gson = new Gson();
+        String json = sp.getString(SP_HOME_LOCATION, "");
+        homeLocation = gson.fromJson(json, LocationInfo.class);
+        isOnTracking = sp.getBoolean(SP_IS_TRACKING, false);
     }
 }
