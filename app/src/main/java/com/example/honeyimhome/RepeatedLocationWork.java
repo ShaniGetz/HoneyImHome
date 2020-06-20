@@ -108,11 +108,6 @@ public class RepeatedLocationWork extends ListenableWorker {
         callback.set(Result.success());
     }
 
-//    private void updatePrevLocation(SharedPreferences prefs, LocationInfo curLocation) {
-//        Gson gson = new Gson();
-//        prefs.edit().putString(SP_PREV_LOCATION, gson.toJson(curLocation)).apply();
-//    }
-
     private float[] distance(LocationInfo first, LocationInfo second) {
         double fLat = first.getLatitude();
         double fLong = first.getLangitude();
