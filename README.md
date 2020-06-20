@@ -5,6 +5,7 @@ I pledge the highest level of ethical principles in support of academic excellen
 
 Question:
 What should we add in our code-base so that when the SMS will get delivered, this notification's text will be changed to "sms sent: ..."?
+
 Answer:
 We can provide a PendingIntent that broadcasts a message that will trigger
 a callback function that updates the contents of our notification, using our notification channel name.
